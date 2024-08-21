@@ -2,9 +2,7 @@
 
 ## Goal
 
-<a href ="https://www.kaggle.com/competitions/isic-2024-challenge">ISIC 2024 - Skin Cancer Detection with 3D-TBP </a> **Top 5%**
-
----
+### <a href ="https://www.kaggle.com/competitions/isic-2024-challenge">ISIC 2024 - Skin Cancer Detection with 3D-TBP </a> **Top 5%**
 
 Identify cancers among skin lesions cropped from 3D total body photographs.
 
