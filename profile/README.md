@@ -65,3 +65,16 @@ All deadlines are at 11:59 PM UTC on the corresponding day unless otherwise note
 ## Technical Stack
 
 `Python` `TensorFlow` `PyTorch`
+
+## Model Architecture
+
+## Result
+
+### Kaggle Score
+
+### Team Project Report
+
+<a href="https://www.notion.so/ISIC-2024-Skin-Cancer-Detection-with-3D-TBP-245e61e7b96e4f4c8054988242b797d8" style="margin-right: 10px;">
+  <img src="https://github.com/user-attachments/assets/baaa10f4-56b7-4b1d-8740-ec61aa433e13" width="80" height="80" alt="Portfolio"></a>
+
+> This is the Team Project Report, Click the icon to move it.
