@@ -2,7 +2,7 @@
 
 ## Goal
 
-### <a href ="https://www.kaggle.com/competitions/isic-2024-challenge">ISIC 2024 - Skin Cancer Detection with 3D-TBP </a> **Top 5%**
+### <a href ="https://www.kaggle.com/competitions/isic-2024-challenge">ISIC 2024 - Skin Cancer Detection with 3D-TBP </a> **Top 40%**
 
 Identify cancers among skin lesions cropped from 3D total body photographs.
 
@@ -16,9 +16,75 @@ Bbinary classification algorithm could be used in settings without access to spe
 
 3D total body photos (TBP)에서 single-lesion crops을 사용해 조직학적으로 확인된 피부암 사례를 식별하는 image-based algorithms을 개발한다. 
 
-## Definition
-
 ## Overview
+
+### **Dataset**
+
+**`train-metadata.csv`**
+
+| Field Name | Description |
+| :--- | :--- |
+| target | Binary class {0: benign, 1: malignant}. |
+| lesion_id | Unique lesion identifier. Present in lesions that were manually tagged as a lesion of interest. 병변의 고유 식별자. |
+| iddx_full | Fully classified lesion diagnosis. 병변 전체의 진단. iddx_1-iddx_5를 :: 구분자로 합쳐놓은 상태. |
+| iddx_1 | First level lesion diagnosis. 1차 진단 범주. |
+| iddx_2 | Second level lesion diagnosis. 2차 진단 범주. |
+| iddx_3 | Third level lesion diagnosis. 3차 진단 범주. |
+| iddx_4 | Fourth level lesion diagnosis. 4차 진단 범주. |
+| iddx_5 | Fifth level lesion diagnosis. 5차 진단 범주. |
+| mel_mitotic_index | Mitotic index of invasive malignant melanomas. 침윤성 악성 흑색종의 유사 분열 지수. |
+| mel_thick_mm | Thickness in depth of melanoma invasion. 흑색종 침윤 두께. |
+| tbp_lv_dnn_lesion_confidence | Lesion confidence score (0-100 scale). + 병변 NN 신뢰도 점수. |
+
+**`train-metadata.csv and test-metadata.csv`**
+
+| Field Name | Description |
+| :--- | :--- |
+| isic_id | Unique case identifier. 각 Sample의 고유 식별자. |
+| patient_id | Unique patient identifier. 환자의 고유 식별자. |
+| age_approx | Approximate age of patient at time of imaging. 촬영 당시 환자의 대략적인 나이. |
+| sex | Sex of the person. |
+| anatom_site_general | Location of the lesion on the patient's body. 병변이 위치한 신체 부위. |
+| clin_size_long_diam_mm | Maximum diameter of the lesion (mm). + 병변의 최대 직경. |
+| image_type | Structured field of the ISIC Archive for image type. 이미지 유형(구조화 된 Field). |
+| tbp_tile_type | Lighting modality of the 3D TBP source image. 3D TBP 원본 Image의 조명 방식 |
+| tbp_lv_A | A inside lesion. + 병변 내부의 A 값. |
+| tbp_lv_Aex | A outside lesion. + 병변 외부의 A 값. |
+| tbp_lv_B | B inside lesion. + 병변 내부의 B 값. |
+| tbp_lv_Bext | B outside lesion.+ 병변 외부의 B 값. |
+| tbp_lv_C | Chroma inside lesion.+ 병변 내부의 색도. |
+| tbp_lv_Cext | Chroma outside lesion.+ 병변 외부의 색도. |
+| tbp_lv_H | Hue inside the lesion, calculated as the angle of A* and B* in L*A*B* color space.  Typical values range from 25 (red) to 75 (brown). + 병변 내부의 색상. |
+| tbp_lv_Hext | Hue outside lesion. + 병변 외부의 색상. |
+| tbp_lv_L | L inside lesion. + 병변 내부의 명도. |
+| tbp_lv_Lext | L outside lesion. + 병변 외부의 명도. |
+| tbp_lv_areaMM2 | 병변의 면적. |
+| tbp_lv_area_perim_ratio | Border jaggedness, the ratio between lesions perimeter and area.  Circular lesions will have low values, irregular shaped lesions will have higher values. Values range 0-10. + 병변 경계의 울퉁불퉁함의 비율. |
+| tbp_lv_color_std_mean | Color irregularity, calculated as the variance of colors within the lesion's boundary. 병변 경계 내 색상 불규칙성. |
+| tbp_lv_deltaA | Average A contrast (inside vs. outside lesion). + 병변 내 외부의 A 대비값. |
+| tbp_lv_deltaB | Average B contrast (inside vs. outside lesion). + 병변 내 외부의 B 대비값. |
+| tbp_lv_deltaL | Average L contrast (inside vs. outside lesion). + 병변 내 외부의 명도 대비값. |
+| tbp_lv_deltaLB | 병변의 명도 및 색상 대비값. |
+| tbp_lv_deltaLBnorm | Contrast between the lesion and its immediate surrounding skin. Low contrast lesions tend to be faintly visible such as freckles, high contrast lesions tend to be those with darker pigment. Calculated as the average delta L*B* of the lesion relative to its immediate background in L*A*B* color space. Typical values range from 5.5 to 25. + 병변과 주변 피부의 명도 및 색상 대비. |
+| tbp_lv_eccentricity | Eccentricity. + 병변의 이심률. |
+| tbp_lv_location | Classification of anatomical location, divides arms & legs to upper & lower, torso into thirds. + 병변의 해부학적 위치(팔, 다리, 몸통 등으로 구분). |
+| tbp_lv_location_simple | Classification of anatomical location, simple. + 병변의 간단한 해부학적 위치. |
+| tbp_lv_minorAxisMM | Smallest lesion diameter (mm). + 병변의 최소 직경. |
+| tbp_lv_nevi_confidence | Nevus confidence score (0-100 scale) is a convolutional neural network classifier estimated probability that the lesion is a nevus.  The neural network was trained on approximately 57,000 lesions that were classified and labeled by a dermatologist. +, ++ 병변이 모반일 가능성에 대한 NN 에측 확률. |
+| tbp_lv_norm_border | Border irregularity (0-10 scale), the normalized average of border jaggedness and asymmetry. + 경계 불규칙성 |
+| tbp_lv_norm_color | Color variation (0-10 scale), the normalized average of color asymmetry and color irregularity. + 색상 변이(정규화 된 값). |
+| tbp_lv_perimeterMM | Perimeter of lesion (mm). + 병변의 둘레. |
+| tbp_lv_radial_color_std_max | Color asymmetry, a measure of asymmetry of the spatial distribution of color within the lesion. This score is calculated by looking at the average standard deviation in L*A*B* color space within concentric rings originating from the lesion center. Values range 0-10. + 병변 내 색상의 비대칭성 |
+| tbp_lv_stdL | Standard deviation of L inside lesion. + 병변 내부 명도의 표준 편차. |
+| tbp_lv_Lext | Standard deviation of L outside lesion. + 병변 외부 명도의 표준 편차. |
+| tbp_lv_symm_2axis | Border asymmetry, a measure of asymmetry of the lesion's contour about an axis perpendicular to the lesion's most symmetric axis.  Lesions with two axes of symmetry will therefore have low scores (more symmetric), while lesions with only one or zero axes of symmetry will have higher scores (less symmetric). This score is calculated by comparing opposite halves of the lesion contour over many degrees of rotation.  The angle where the halves are most similar identifies the principal axis of symmetry, while the second axis of symmetry is perpendicular to the principal axis. Border asymmetry is reported as the asymmetry value about this second axis. Values range 0-10. + 병변 경계 비대칭성. |
+| tbp_lv_symm_2axis_angle | Lesion border asymmetry angle. + 병변 경계 비대칭성 각도. |
+| tbp_lv_x | X-coordinate of the lesion on 3D TBP. + 3D TBP에서 병변의 X 좌표. |
+| tbp_lv_y | Y-coordinate of the lesion on 3D TBP. + 3D TBP에서 병변의 Y 좌표. |
+| tbp_lv_z | Z-coordinate of the lesion on 3D TBP. + 3D TBP에서 병변의 Z 좌표. |
+| attribution | Image attribution, synonymous with image source. |
+| copyright_license | Copyright license. |
+
 
 ### **Evaluation**
 
@@ -33,8 +99,6 @@ pAUC는 ROC 곡선의 특정 부분, 즉 TPR(참 양성 비율)이 80% 이상인
 점수는 [0.0, 0.2] 범위 내에서 주어지며, TPR 80% 이상에서의 분류 성능을 강조한다. Image에서 파란색과 빨간색 영역이 각각 두 Algorithm의 pAUC를 나타낸다. 
 
 ![image](https://github.com/user-attachments/assets/ae199c45-0137-4efd-ad6d-a48757546501)
-
-### **Dataset**
 
 ### **Submission**
 
@@ -68,9 +132,13 @@ All deadlines are at 11:59 PM UTC on the corresponding day unless otherwise note
 
 ## Model Architecture
 
+<img width ="400" height="2800" src="https://github.com/user-attachments/assets/03d6f83a-3088-4e8d-bdb3-0f025a24bbf8">
+
 ## Result
 
 ### Kaggle Score
+
+<img width="975" alt="스크린샷 2024-09-10 오후 2 40 40" src="https://github.com/user-attachments/assets/ebfbcf37-461e-4aa2-b10a-eeb26461cb12">
 
 ### Team Project Report
 
